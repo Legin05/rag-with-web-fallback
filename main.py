@@ -5,7 +5,7 @@ from pathlib import Path
 from src.ingestion.loader import load_pdf
 from src.ingestion.chunker import chunk_documents
 from src.ingestion.embeddings import create_embeddings
-
+from src.vector_store import store_embeddings
 def main():
     pdf_path = Path("src/data/spring_boot_tutorial.pdf")
 
@@ -31,17 +31,22 @@ def main():
     chunks
     )
 
-    print(f"Total Chunks : {len(documents)}")
+    # print(f"Total Chunks : {len(documents)}")
 
-    print(f"Total Embeddings : {len(embeddings)}")
+    # print(f"Total Embeddings : {len(embeddings)}")
 
-    print(
-    f"Embedding Dimension : {len(embeddings[0])}"
+    # print(
+    # f"Embedding Dimension : {len(embeddings[0])}"
+    # )
+
+    # print()
+
+    # print(embeddings[0][:10])
+
+    store_embeddings(
+        chunks,
+        embeddings,
     )
-
-    print()
-
-    print(embeddings[0][:10])
 
 
 if __name__ == "__main__":
