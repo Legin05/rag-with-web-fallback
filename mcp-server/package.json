@@ -8,6 +8,7 @@
     "watch": "tsx watch src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
+  "inspect": "cross-env DANGEROUSLY_OMIT_AUTH=true npx @modelcontextprotocol/inspector npx tsx src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -20,6 +21,7 @@
   },
   "devDependencies": {
     "@types/node": "^26.1.2",
+    "cross-env": "^10.1.0",
     "tsx": "^4.23.1",
     "typescript": "^7.0.2"
   }
