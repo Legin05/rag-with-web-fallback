@@ -4,6 +4,7 @@ from pymongo import MongoClient
 from dotenv import load_dotenv
 
 from langchain_core.documents import Document
+from pymongo.command_cursor import CommandCursor
 
 
 load_dotenv()
@@ -47,7 +48,7 @@ def ping_mongodb():
         print(f"Failed to connect to MongoDB: {e}")
         return False
 
-def create_database_and_collection():
+def get_collection():
 
     client = get_mongodb_client()
 
@@ -79,6 +80,9 @@ def create_database_and_collection():
     return collection
 
 
+
+
+
 def store_embeddings(
     documents: list[Document],
     embeddings: list[list[float]],
@@ -88,7 +92,7 @@ def store_embeddings(
     and embeddings in MongoDB.
     """
 
-    collection = create_database_and_collection()
+    collection = get_collection()
 
     records = []
 
@@ -116,4 +120,91 @@ def store_embeddings(
 
     print(
         f"{len(records)} chunks inserted."
+    )
+
+
+
+"""
+Performs keyword-based text search using
+MongoDB Atlas Search.
+"""
+def text_search(
+    question: str,
+    limit: int=10       
+):
+    collection=get_collection()
+
+    pipeline =[
+        {
+            "$search":{
+                "index": "spring_chunks_text_index",
+                "text":{
+                    "query": question,
+                    "path":"text"
+                }
+            }
+        },
+        {
+            "$limit": limit
+        },
+        {
+            "$project":{
+                "_id": 1,
+            "text": 1,
+            "metadata": 1,
+            "score": {
+                "$meta": "searchScore"
+            }
+            }
+        }
+    ]
+
+    cursor: CommandCursor = collection.aggregate(pipeline)
+    results=[]
+    for doc in cursor:
+        print(doc)
+        results.append(doc)
+
+
+    return results  
+
+
+
+
+def vector_search(
+    query_vector: list[float],
+    limit: int = 10,
+    num_candidates: int = 100
+):
+    """
+    Performs vector similarity search using
+    MongoDB Atlas Vector Search.
+    """
+
+    collection = get_collection()
+
+    pipeline = [
+        {
+            "$vectorSearch": {
+                "index": "spring_chunks_vector_index",
+                "path": "embedding",
+                "queryVector": query_vector,
+                "numCandidates": num_candidates,
+                "limit": limit
+            }
+        },
+        {
+            "$project": {
+                "_id": 1,
+                "text": 1,
+                "metadata": 1,
+                "score": {
+                    "$meta": "vectorSearchScore"
+                }
+            }
+        }
+    ]
+
+    return list(
+        collection.aggregate(pipeline)
     )

@@ -13,22 +13,22 @@ def load_pdf(file_path: str):
     return documents
 
 
-if __name__ == "__main__":
-     pdf_path = Path("src/data/spring_boot_tutorial.pdf")
+# if __name__ == "__main__":
+#      pdf_path = Path("src/data/spring_boot_tutorial.pdf")
 
-     documents = load_pdf(pdf_path)
+#      documents = load_pdf(pdf_path)
 
      
      
 
-     print(f"Total Pages : {len(documents)}")
-     print("-" * 50)
+#      print(f"Total Pages : {len(documents)}")
+#      print("-" * 50)
 
-     print("First Page Content:\n")
+#      print("First Page Content:\n")
 
-     print(documents[2].page_content)
-     print("-" * 50)
+#      print(documents[2].page_content)
+#      print("-" * 50)
 
-     print("Metadata :\n")
+#      print("Metadata :\n")
 
-     print(documents[2].metadata)
+#      print(documents[2].metadata)
