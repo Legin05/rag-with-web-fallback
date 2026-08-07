@@ -30,7 +30,7 @@ def get_mongodb_client():
 
     uri = os.getenv("MONGODB_URI")
 
-    print(uri)
+    
 
     return MongoClient(uri)
 
@@ -64,18 +64,18 @@ def get_collection():
 
     collection = db[collection_name]
 
-    print(
-        f"Database : {database_name}"
-    )
+    # print(
+    #     f"Database : {database_name}"
+    # )
 
-    print(
-        f"Collection : {collection_name}"
-    )
+    # print(
+    #     f"Collection : {collection_name}"
+    # )
 
-    print(
-        "Successfully created/accessed "
-        "the collection."
-    )
+    # print(
+    #     "Successfully created/accessed "
+    #     "the collection."
+    # )
 
     return collection
 

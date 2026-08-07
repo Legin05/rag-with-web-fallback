@@ -210,21 +210,21 @@ if __name__ == "__main__":
         top_k=5
     )
 
-    for rank, result in enumerate(
-        results,
-        start=1
-    ):
+    # for rank, result in enumerate(
+    #     results,
+    #     start=1
+    # ):
 
-        print("\n------------------------")
+    #     print("\n------------------------")
 
-        print("Rank:", rank)
+    #     print("Rank:", rank)
 
-        print(
-            "Fusion Score:",
-            result["fusion_score"]
-        )
+    #     print(
+    #         "Fusion Score:",
+    #         result["fusion_score"]
+    #     )
 
-        print(
-            "Text:",
-            result["text"][:300]
-        )
+    #     print(
+    #         "Text:",
+    #         result["text"][:300]
+    #     )
