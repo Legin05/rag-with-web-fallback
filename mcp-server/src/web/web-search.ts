@@ -1,4 +1,5 @@
 import { tavily } from "@tavily/core";
+import  fetchPageFromChromium  from "./web-fetcher.js";
 
 
 import * as cheerio from "cheerio";
@@ -23,17 +24,17 @@ async function searchWeb(
     
 }
 
-// test 
-async function main() {
-//   const results = await searchWeb("latest developments in RAG", 5);
+// // test 
+// async function main() {
+// //   const results = await searchWeb("latest developments in RAG", 5);
 
 
-const results = await fetchPage("https://zilliz.com/blog/8-latest-rag-advancements-every-developer-should-know")
+// const results = await fetchPage("https://zilliz.com/blog/8-latest-rag-advancements-every-developer-should-know")
 
-  console.log(results);
-}
+//   console.log(results);
+// }
 
-main();
+// main();
 
 async function fetchPage(url: string) : Promise<string>{
 
@@ -119,3 +120,14 @@ export async function webSearchAndFetch(
   return results
 
 }
+
+
+async function mainClass() {
+  const text = await fetchPageFromChromium(
+    "https://spring.io/projects/spring-boot"
+  );
+
+  console.log(text.slice(0, 3000));
+}
+
+mainClass();
