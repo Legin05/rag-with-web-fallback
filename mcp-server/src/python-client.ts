@@ -1,6 +1,15 @@
 import { spawn } from "node:child_process"
 
-function runPythonSearch(question: string): Promise<string> {
+
+export type SearchResult ={
+  _id: string;
+  text: string;
+  metadata: Record<string, unknown>;
+  score?: number;
+  fusion_score?:number;
+}
+
+function runPythonSearch(question: string): Promise<SearchResult[]> {
 
     return new Promise((resolve, reject)=>{
        
@@ -38,7 +47,18 @@ function runPythonSearch(question: string): Promise<string> {
         return;
         }
 
-        resolve(output);
+        try {
+        const results: SearchResult[] = JSON.parse(output);
+        // console.log("result",results);
+        
+        resolve(results);
+      } catch (err) {
+        reject(
+          new Error(
+            `Failed to parse Python output as JSON.\n${output}`
+          )
+        );
+      }
     });
 
     });

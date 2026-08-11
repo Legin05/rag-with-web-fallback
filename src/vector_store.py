@@ -162,7 +162,7 @@ def text_search(
     cursor: CommandCursor = collection.aggregate(pipeline)
     results=[]
     for doc in cursor:
-        print(doc)
+        
         results.append(doc)
 
 
