@@ -1,5 +1,11 @@
 import { spawn } from "node:child_process"
+import path from "node:path"
+import fs from "node:fs"
+import { fileURLToPath } from "node:url"
 
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+const ragRootDir = path.resolve(__dirname, "../../")
 
 export type SearchResult ={
   _id: string;
@@ -9,22 +15,22 @@ export type SearchResult ={
   fusion_score?:number;
 }
 
+function getPythonExecutable(): { cmd: string; prefixArgs: string[] } {
+  const venvWin = path.join(ragRootDir, ".venv", "Scripts", "python.exe");
+  const venvUnix = path.join(ragRootDir, ".venv", "bin", "python");
+  if (fs.existsSync(venvWin)) return { cmd: venvWin, prefixArgs: [] };
+  if (fs.existsSync(venvUnix)) return { cmd: venvUnix, prefixArgs: [] };
+  return { cmd: "uv", prefixArgs: ["run", "python"] };
+}
+
 function runPythonSearch(question: string): Promise<SearchResult[]> {
 
     return new Promise((resolve, reject)=>{
-       
+        const { cmd, prefixArgs } = getPythonExecutable();
         const python = spawn(
-            "uv",
-             [
-        "run",
-        "python",
-        "-m",
-        "src.retrieval.search",
-        question
-      ],
-      {
-        cwd: "/home/k-joel-joyson/Projects/rag-with-web-fallback"
-      }
+            cmd,
+            [...prefixArgs, "-m", "src.retrieval.search", question],
+            { cwd: ragRootDir }
         );
 
 
@@ -48,18 +54,24 @@ function runPythonSearch(question: string): Promise<SearchResult[]> {
         }
 
         try {
-        const results: SearchResult[] = JSON.parse(output);
-        // console.log("result",results);
-        
-        resolve(results);
-      } catch (err) {
-        reject(
-          new Error(
-            `Failed to parse Python output as JSON.\n${output}`
-          )
-        );
-      }
-    });
+          const jsonStart = output.indexOf("[");
+          const jsonEnd = output.lastIndexOf("]");
+
+          if (jsonStart === -1 || jsonEnd === -1 || jsonStart >= jsonEnd) {
+            throw new Error(`No JSON array found in stdout output: ${output}`);
+          }
+
+          const jsonString = output.slice(jsonStart, jsonEnd + 1);
+          const results: SearchResult[] = JSON.parse(jsonString);
+          resolve(results);
+        } catch (err) {
+          reject(
+            new Error(
+              `Failed to parse Python output as JSON.\n${output}`
+            )
+          );
+        }
+      });
 
     });
 }

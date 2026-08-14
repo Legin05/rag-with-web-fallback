@@ -2,9 +2,9 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp";
 import z from "zod";
 import { StdioServerTransport } from "@modelcontextprotocol/server/stdio";
 
-import { webSearchAndFetch } from "./web/web-search.js";
+import { webSearchAndFetch } from "./web/web-search";
 
-import { searchWebWithFallback } from "./orchestrator.js";
+import { searchWebWithFallback } from "./orchestrator";
 const server = new McpServer({
   name: "rag-mcp-server",
   version: "1.0.0",

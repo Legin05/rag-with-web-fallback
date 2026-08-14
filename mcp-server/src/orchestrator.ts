@@ -1,5 +1,5 @@
-import runPythonSearch, { SearchResult } from "./python-client.js";
-import { webSearchAndFetch } from "./web/web-search.js";
+import runPythonSearch, { SearchResult } from "./python-client";
+import { webSearchAndFetch } from "./web/web-search";
 
 
 const FALLBACK_THRESHOLD = 0.02;

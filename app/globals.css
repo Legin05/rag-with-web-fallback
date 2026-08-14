@@ -1,0 +1,66 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-bg: #131314;
+  --color-surface: #1e1f20;
+  --color-border: #2e2f31;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: #e3e3e3;
+  font-family: 'Inter', sans-serif;
+  overflow-x: hidden;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #131314;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2e2f31;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #444746;
+}
+
+/* Glass & Card utilities (ChatGPT / Gemini Dark) */
+.dark-panel {
+  background-color: #1e1f20;
+  border: 1px solid #2e2f31;
+}
+
+.dark-input-bar {
+  background-color: #1e1e1e;
+  border: 1px solid #383838;
+}
+
+.dark-input-bar:focus-within {
+  border-color: #555555;
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.05);
+}
+
+/* Source Badges */
+.badge-web-fallback {
+  background: rgba(234, 179, 8, 0.12);
+  border: 1px solid rgba(234, 179, 8, 0.3);
+  color: #fef08a;
+}
+
+.badge-rag-active {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #6ee7b7;
+}

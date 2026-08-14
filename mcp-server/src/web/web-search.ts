@@ -1,5 +1,4 @@
 import { tavily } from "@tavily/core";
-import  fetchPageFromChromium  from "./web-fetcher.js";
 
 
 import * as cheerio from "cheerio";
@@ -122,12 +121,12 @@ export async function webSearchAndFetch(
 }
 
 
-async function mainClass() {
-  const text = await fetchPageFromChromium(
-    "https://spring.io/projects/spring-boot"
-  );
-
-  console.log(text.slice(0, 3000));
-}
-
-mainClass();
+// async function mainClass() {
+//   const text = await fetchPageFromChromium(
+//     "https://spring.io/projects/spring-boot"
+//   );
+// 
+//   console.log(text.slice(0, 3000));
+// }
+// 
+// mainClass();
