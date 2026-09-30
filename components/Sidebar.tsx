@@ -46,7 +46,9 @@ export default function Sidebar({ onIngestSuccess }: SidebarProps) {
 
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="p-2 rounded-xl text-slate-400 hover:text-slate-100 hover:bg-[#2e2f31] transition-all mx-auto"
+          className={`p-2 rounded-xl text-slate-400 hover:text-slate-100 hover:bg-[#2e2f31] transition-all ${
+            collapsed ? "mx-auto" : "ml-auto"
+          }`}
           title={collapsed ? "Expand Sidebar" : "Collapse Sidebar"}
         >
           {collapsed ? (
@@ -75,7 +77,7 @@ export default function Sidebar({ onIngestSuccess }: SidebarProps) {
           {/* System Services Status */}
           <div className="p-4 rounded-2xl bg-[#131314] border border-[#2e2f31] space-y-3">
             <div className="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center justify-between">
-              <span>System Health</span>
+              <span>System Status</span>
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
             </div>
 
@@ -112,15 +114,7 @@ export default function Sidebar({ onIngestSuccess }: SidebarProps) {
             </div>
           </div>
 
-          {/* Quick Guide */}
-          <div className="p-3.5 rounded-xl bg-[#131314] border border-[#2e2f31] text-xs text-slate-400 space-y-1.5">
-            <div className="flex items-center gap-1.5 text-slate-300 font-semibold">
-              <HelpCircle className="w-3.5 h-3.5 text-emerald-400" /> How Fallback Works
-            </div>
-            <p className="text-[11px] leading-relaxed">
-              When you ask a question, the MCP orchestrator runs hybrid search. If your local vector score is below 0.02, it smoothly falls back to live web search!
-            </p>
-          </div>
+          
         </div>
       ) : (
         <div className="flex-1 flex flex-col items-center py-6 space-y-6 text-slate-400">

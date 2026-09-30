@@ -301,7 +301,7 @@ export default function RagChat() {
           </button>
         </form>
         <div className="text-[11px] text-slate-500 text-center mt-2">
-          Press <kbd className="px-1 py-0.5 bg-[#1e1f20] border border-[#2e2f31] rounded text-slate-400 font-mono">Enter</kbd> to send, <kbd className="px-1 py-0.5 bg-[#1e1f20] border border-[#2e2f31] rounded text-slate-400 font-mono">Shift + Enter</kbd> for newline.
+         
         </div>
       </div>
     </div>
