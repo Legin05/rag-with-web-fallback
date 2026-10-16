@@ -15,10 +15,12 @@ import {
   BookOpen,
   Copy,
   Check,
+  AlertCircle,
+  RotateCcw,
 } from "lucide-react";
 
 export default function RagChat() {
-  const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat({
+  const { messages, input, handleInputChange, handleSubmit, isLoading, error, reload } = useChat({
     api: "/api/chat",
   });
 
@@ -266,6 +268,22 @@ export default function RagChat() {
                 Searching vector DB & orchestrating response...
               </span>
             </div>
+          </div>
+        )}
+
+        {error && (
+          <div className="max-w-3xl mx-auto w-full flex items-center justify-between p-4 rounded-2xl bg-red-950/40 border border-red-800/60 text-xs text-red-200">
+            <div className="flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 text-red-400 shrink-0" />
+              <span>{error.message || "Failed to generate response. Please try again."}</span>
+            </div>
+            <button
+              onClick={() => reload()}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-red-900/50 hover:bg-red-800/60 border border-red-700/50 text-red-200 transition-all font-medium"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+              <span>Retry</span>
+            </button>
           </div>
         )}
 

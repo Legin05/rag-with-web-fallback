@@ -47,23 +47,18 @@ def reciprocal_rank_fusion(
 
     scores = {}
     documents = {}
-
+    text_scores = {}
+    vector_scores = {}
 
     for rank, result in enumerate(
         text_results,
         start=1
     ):
         document_id = str(result["_id"])
-
         rrf_score = 1 / (k + rank)
-
-        scores[document_id] =(
-            scores.get(document_id, 0)
-            + rrf_score
-        )
-
-        documents[document_id] = result
-
+        scores[document_id] = scores.get(document_id, 0) + rrf_score
+        documents[document_id] = dict(result)
+        text_scores[document_id] = result.get("score", 0.0)
 
     # -------------------------
     # Vector search results
@@ -73,21 +68,14 @@ def reciprocal_rank_fusion(
         vector_results,
         start=1
     ):
-
         document_id = str(result["_id"])
-
         rrf_score = 1 / (k + rank)
+        scores[document_id] = scores.get(document_id, 0) + rrf_score
+        if document_id not in documents:
+            documents[document_id] = dict(result)
+        vector_scores[document_id] = result.get("score", 0.0)
 
-        scores[document_id] = (
-            scores.get(document_id, 0)
-            + rrf_score
-        )
-
-        documents[document_id] = result 
-
-
-
-        # -------------------------
+    # -------------------------
     # Sort by fusion score
     # -------------------------
 
@@ -98,12 +86,12 @@ def reciprocal_rank_fusion(
         reverse=True
     )
 
-    # Add fusion score
+    # Add fusion score and separate scores
     for document in ranked_documents:
-
-        document["fusion_score"] = scores[
-            str(document["_id"])
-        ]
+        doc_id = str(document["_id"])
+        document["fusion_score"] = scores[doc_id]
+        document["vector_score"] = vector_scores.get(doc_id, 0.0)
+        document["text_score"] = text_scores.get(doc_id, 0.0)
 
     return ranked_documents[:top_k]
 

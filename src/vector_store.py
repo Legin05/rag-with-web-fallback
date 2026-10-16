@@ -1,126 +1,74 @@
 import os
-
-from pymongo import MongoClient
 from dotenv import load_dotenv
-
-from langchain_core.documents import Document
+from pymongo import MongoClient, UpdateOne
 from pymongo.command_cursor import CommandCursor
-
-
-load_dotenv()
-
-
-
-def get_mongodb_client():
-
-    return MongoClient(
-        os.getenv("MONGODB_URI")
-    )
-
-
-import os
-
-from pymongo import MongoClient
-from dotenv import load_dotenv
+from langchain_core.documents import Document
 
 load_dotenv()
 
-
 def get_mongodb_client():
-
     uri = os.getenv("MONGODB_URI")
-
-    
-
+    if not uri:
+        raise ValueError("MONGODB_URI is not set in environment variables.")
     return MongoClient(uri)
 
 def ping_mongodb():
     try:
         client = get_mongodb_client()
-
-        # Send a ping command
         client.admin.command("ping")
-
         print("Successfully connected to MongoDB!")
         return True
-
     except Exception as e:
         print(f"Failed to connect to MongoDB: {e}")
         return False
 
 def get_collection():
-
     client = get_mongodb_client()
-
-    database_name = os.getenv(
-        "DATABASE_NAME"
-    )
-
-    collection_name = os.getenv(
-        "COLLECTION_NAME"
-    )
-
-    db = client[database_name]
-
-    collection = db[collection_name]
-
-    # print(
-    #     f"Database : {database_name}"
-    # )
-
-    # print(
-    #     f"Collection : {collection_name}"
-    # )
-
-    # print(
-    #     "Successfully created/accessed "
-    #     "the collection."
-    # )
-
-    return collection
-
-
-
-
+    database_name = os.getenv("DATABASE_NAME", "rag_database")
+    collection_name = os.getenv("COLLECTION_NAME", "documents")
+    return client[database_name][collection_name]
 
 def store_embeddings(
     documents: list[Document],
     embeddings: list[list[float]],
+    upsert: bool = True,
 ):
     """
-    Stores chunk text, metadata
-    and embeddings in MongoDB.
+    Stores chunk text, metadata and embeddings in MongoDB.
+    Uses upsert if chunk_id is available to avoid duplicates.
     """
-
     collection = get_collection()
 
-    records = []
+    operations = []
+    for document, embedding in zip(documents, embeddings):
+        record = {
+            "text": document.page_content,
+            "embedding": embedding,
+            "metadata": document.metadata,
+        }
+        chunk_id = document.metadata.get("chunk_id")
+        source = document.metadata.get("source")
 
-    for document, embedding in zip(
-        documents,
-        embeddings,
-    ):
+        if upsert and chunk_id is not None:
+            filter_query = {"metadata.chunk_id": chunk_id}
+            if source:
+                filter_query["metadata.source"] = source
+            operations.append(UpdateOne(filter_query, {"$set": record}, upsert=True))
+        else:
+            operations.append(record)
 
-        records.append(
-            {
-                "text":
-                document.page_content,
+    if not operations:
+        print("No chunks to store.")
+        return
 
-                "embedding":
-                embedding,
-
-                "metadata":
-                document.metadata,
-            }
+    if upsert and isinstance(operations[0], UpdateOne):
+        result = collection.bulk_write(operations)
+        print(
+            f"Stored {len(operations)} chunks (upserted: {result.upserted_count}, modified: {result.modified_count}, matched: {result.matched_count})."
         )
-
-    collection.insert_many(
-        records
-    )
-
-    print(
-        f"{len(records)} chunks inserted."
-    )
+    else:
+        collection.insert_many(operations)
+        print(f"{len(operations)} chunks inserted.")
 
 
 

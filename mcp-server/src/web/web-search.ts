@@ -1,26 +1,25 @@
 import { tavily } from "@tavily/core";
-
-
 import * as cheerio from "cheerio";
 
-
-const client = tavily({
-    apiKey: process.env.TAVILY_API_KEY!,
-})
-
+function getTavilyClient() {
+  const apiKey = process.env.TAVILY_API_KEY;
+  if (!apiKey) {
+    throw new Error("TAVILY_API_KEY is not set in environment variables.");
+  }
+  return tavily({ apiKey });
+}
 
 async function searchWeb(
     query: string,
     maxResults: number = 5
 ) {
-
+    const client = getTavilyClient();
     const response = await client.search(query, {
         maxResults,
         searchDepth: "advanced"
     });
 
-    return response.results
-    
+    return response.results;
 }
 
 // // test 
@@ -116,17 +115,5 @@ export async function webSearchAndFetch(
     }
   }
 
-  return results
-
+  return results;
 }
-
-
-// async function mainClass() {
-//   const text = await fetchPageFromChromium(
-//     "https://spring.io/projects/spring-boot"
-//   );
-// 
-//   console.log(text.slice(0, 3000));
-// }
-// 
-// mainClass();

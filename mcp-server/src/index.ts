@@ -1,10 +1,23 @@
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp";
 import z from "zod";
 import { StdioServerTransport } from "@modelcontextprotocol/server/stdio";
 
 import { webSearchAndFetch } from "./web/web-search";
-
 import { searchWebWithFallback } from "./orchestrator";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const envPath = path.resolve(__dirname, "../../.env");
+if (fs.existsSync(envPath) && typeof process.loadEnvFile === "function") {
+  try {
+    process.loadEnvFile(envPath);
+  } catch {
+    // env file loaded or ignored
+  }
+}
+
 const server = new McpServer({
   name: "rag-mcp-server",
   version: "1.0.0",

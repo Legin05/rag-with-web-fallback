@@ -5,7 +5,10 @@ import { fileURLToPath } from "node:url"
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
-const ragRootDir = path.resolve(__dirname, "../../")
+const baseDir = path.resolve(__dirname, "../../")
+const ragRootDir = fs.existsSync(path.join(baseDir, ".venv"))
+  ? baseDir
+  : (process.env.RAG_ROOT_DIR || process.cwd())
 
 export type SearchResult ={
   _id: string;
@@ -15,22 +18,22 @@ export type SearchResult ={
   fusion_score?:number;
 }
 
-function getPythonExecutable(): { cmd: string; prefixArgs: string[] } {
+function getPythonExecutable(): { cmd: string; prefixArgs: string[]; useShell: boolean } {
   const venvWin = path.join(ragRootDir, ".venv", "Scripts", "python.exe");
   const venvUnix = path.join(ragRootDir, ".venv", "bin", "python");
-  if (fs.existsSync(venvWin)) return { cmd: venvWin, prefixArgs: [] };
-  if (fs.existsSync(venvUnix)) return { cmd: venvUnix, prefixArgs: [] };
-  return { cmd: "uv", prefixArgs: ["run", "python"] };
+  if (fs.existsSync(venvWin)) return { cmd: venvWin, prefixArgs: [], useShell: false };
+  if (fs.existsSync(venvUnix)) return { cmd: venvUnix, prefixArgs: [], useShell: false };
+  return { cmd: "uv", prefixArgs: ["run", "python"], useShell: process.platform === "win32" };
 }
 
 function runPythonSearch(question: string): Promise<SearchResult[]> {
 
     return new Promise((resolve, reject)=>{
-        const { cmd, prefixArgs } = getPythonExecutable();
+        const { cmd, prefixArgs, useShell } = getPythonExecutable();
         const python = spawn(
             cmd,
             [...prefixArgs, "-m", "src.retrieval.search", question],
-            { cwd: ragRootDir }
+            { cwd: ragRootDir, shell: useShell }
         );
 
 
@@ -43,6 +46,10 @@ function runPythonSearch(question: string): Promise<SearchResult[]> {
 
     python.stderr.on("data", (data) => {
       error += data.toString();
+    });
+
+    python.on("error", (err) => {
+      reject(new Error(`Failed to spawn Python process (${cmd}): ${err.message}`));
     });
 
     python.on("close", (code) => {

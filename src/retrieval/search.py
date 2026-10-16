@@ -10,7 +10,11 @@ from src.retrieval.retriever import hybrid_search
 
 
 def main():
-    question = sys.argv[1]
+    if len(sys.argv) < 2:
+        print(json.dumps([]))
+        return
+
+    question = " ".join(sys.argv[1:])
 
     results = hybrid_search(
         question=question,
